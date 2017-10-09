@@ -13,5 +13,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-
+    try:
+        main()
+        sys.exit(0)
+    except KeyboardInterrupt:
+        sys.exit(-1)
+    except:
+        sys.exit(-100)
