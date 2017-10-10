@@ -9,11 +9,12 @@ import time
 
 
 # Constants
-QUERY = 'A'
+QUERY = bytes('A', 'utf-8')
 FILEPATH = '/var/www/html/'
-FILENAME = dataplot.csv
+FILENAME = "dataplot.csv"
 SERIALPATH = "/dev/serial0"
-LENGTH = 30
+LENGTH = 10000
+WILL_PLOT = True
 
 
 # serial_init initializes serial with the correct device, specified in the constant SERIALPATH
@@ -46,6 +47,16 @@ def plot_to_csv(datal):
         print("Error writing to file, check permissions and lsof")
 
 
+def write_to_csv(row, file):
+    try:
+        file.write(row)
+        file.flush()
+        return 0
+    except OSError:
+        print("Error writing to file, check permissions and lsof")
+        return -1
+
+
 # function to read values for a specified time, from the serial port.
 # Function saves the starting time into a variable, to check how much
 # time has passed since last iteration. When the amount specified in
@@ -55,20 +66,30 @@ def plot_to_csv(datal):
 def read_values(port, length):
     begint = time.time()
     datal = []
+    try:
+        file = open(os.path.abspath(FILEPATH + FILENAME), 'w')
+        file.write("Time,Temperature\n")
+    except OSError:
+        print("Writing to file not working, exiting read_values()")
     while time.time() - begint < length:
         appendl = []
-        appendl.append(time.time())
-        valread = serial_query(port).rstrip()
+        timestr = time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())
+        appendl.append(timestr)
+        valread = float(serial_query(port, QUERY).rstrip())
         appendl.append(valread)
-        datal.append(datal)
+        row = str(appendl[0]) + "," + str(appendl[1]) + "\n"
+        write_to_csv(row, file)
+        #time.sleep(1)
+        #datal.append(appendl)
+    file.close()
     return datal
 
 
 def main():
     port = serial_init()
     datal = read_values(port, LENGTH)
-    if WILL_PLOT:
-        plot_to_csv(datal)
+    #if WILL_PLOT:
+    #    plot_to_csv(datal)
     sys.exit(0)
 
 
@@ -78,7 +99,9 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
+        file.close()
         sys.exit(0)
 else:
     print("This program has to be run as main!")
+    file.close()
     sys.exit(-1)
