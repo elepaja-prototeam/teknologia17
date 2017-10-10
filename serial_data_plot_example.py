@@ -13,6 +13,7 @@ QUERY = 'A'
 FILEPATH = '/var/www/html/'
 FILENAME = dataplot.csv
 SERIALPATH = "/dev/serial0"
+LENGTH = 30
 
 
 # serial_init initializes serial with the correct device, specified in the constant SERIALPATH
@@ -63,12 +64,19 @@ def read_values(port, length):
     return datal
 
 
+def main():
+    port = serial_init()
+    datal = read_values(port, LENGTH)
+    if WILL_PLOT:
+        plot_to_csv(datal)
+    sys.exit(0)
+
+
 # If the program is run as a __main__ module, run main; otherwise
 # complain about not being run as main.
 if __name__ == '__main__':
     try:
         main()
-        sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(0)
 else:
