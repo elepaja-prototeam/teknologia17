@@ -13,7 +13,7 @@ QUERY = bytes('A', 'utf-8')
 FILEPATH = '/var/www/html/'
 FILENAME = "dataplot.csv"
 SERIALPATH = "/dev/serial0"
-LENGTH = 10000
+LENGTH = 15
 WILL_PLOT = True
 
 
